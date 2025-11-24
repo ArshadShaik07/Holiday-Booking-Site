@@ -111,29 +111,37 @@ const updateMyProfile = async (req, res) => {
 	const id = req.user.id;
 	const updates = { ...req.body };
 
-	delete updates.password;
 	delete updates._id;
 	delete updates._createdAt;
+	console.log(updates.password);
 
-	if (updates.email) {
+	if (updates.email && updates.email.length !== 0) {
 		const email = updates.email.toLowerCase().trim();
 		const exists = await User.findOne({ email });
 		if (exists) {
-			return res.status(400).json("email already exists!");
+			res.status(400);
+			throw Error("email already exists!");
+			return;
 		} else {
 			updates.email = email;
 		}
 	}
-	if (updates.username) {
+	if (updates.username && updates.username.length !== 0) {
 		const username = updates.username.trim();
 		const exists = await User.findOne({ username });
 		if (exists) {
-			return res.status(400).json("username already exists!");
+			res.status(400);
+			throw Error("username already exists!");
+			return;
 		} else {
 			updates.username = username;
 		}
 	}
-
+	if (updates.password && updates.password.length !== 0) {
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(updates.password, salt);
+		updates.password = hashedPassword;
+	}
 	const updatedUser = await User.findByIdAndUpdate(id, updates, {
 		new: true,
 	}).select("-password");

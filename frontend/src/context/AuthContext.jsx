@@ -14,7 +14,7 @@ function AuthProvider({ children }) {
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [hotels, setHotels] = useState([]);
 	const [flights, setFlights] = useState([]);
-
+	const [updating, setUpdating] = useState(false);
 	async function handleRegister() {
 		try {
 			let res = await axios.post("http://localhost:3000/api/register", {
@@ -75,6 +75,31 @@ function AuthProvider({ children }) {
 		}
 	}
 
+	async function updateProfile(email = "", username = "", password = "") {
+		try {
+			const updates = {};
+
+			if (email.length !== 0) updates.email = email;
+			if (username.length !== 0) updates.username = username;
+			if (password.length !== 0) updates.password = password;
+
+			let res = await axios.patch(
+				"http://localhost:3000/api/me",
+				updates,
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}
+			);
+			alert("updated successfully");
+			console.log(res.data);
+			setUpdating(false);
+		} catch (e) {
+			console.log(e.response);
+		}
+	}
+
 	async function fetchHotels(city) {
 		try {
 			const res = await axios.get(
@@ -109,6 +134,89 @@ function AuthProvider({ children }) {
 		return res.data;
 	}
 
+	async function bookHotel(id, price, date) {
+		try {
+			const res = await axios.post(
+				"http://localhost:3000/api/bookings",
+				{
+					type: "hotel",
+					itemId: id,
+					price,
+					date,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}
+			);
+			console.log(res.data);
+		} catch (e) {
+			console.log(e.response.data.error);
+			if (e.response.data.error === "forbidden page!") {
+				alert("login first to book hotels!");
+			}
+		}
+	}
+
+	async function bookFlight(id, price, date) {
+		try {
+			const res = await axios.post(
+				"http://localhost:3000/api/bookings",
+				{
+					type: "flight",
+					itemId: id,
+					price,
+					date,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}
+			);
+			console.log(res.data);
+		} catch (e) {
+			console.log(e.response.data.error);
+			if (e.response.data.error === "forbidden page!") {
+				alert("login first to book flights!");
+			}
+		}
+	}
+
+	async function getMyProfile() {
+		const res = await axios.get("http://localhost:3000/api/me", {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+		return res.data;
+	}
+
+	async function getMybookings() {
+		const res = await axios.get("http://localhost:3000/api/mybookings", {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+		console.log(res.data);
+		return res.data;
+	}
+
+	async function deleteBooking(id) {
+		const res = await axios.delete(
+			`http://localhost:3000/api/bookings/${id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			}
+		);
+		alert(res.data.message);
+	}
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -131,6 +239,14 @@ function AuthProvider({ children }) {
 				flights,
 				fetchFlightById,
 				fetchHotelById,
+				bookHotel,
+				bookFlight,
+				getMyProfile,
+				getMybookings,
+				deleteBooking,
+				updateProfile,
+				updating,
+				setUpdating,
 			}}
 		>
 			{children}

@@ -4,8 +4,9 @@ import { AuthContext } from "../context/AuthContext";
 import { useContext, useState } from "react";
 function FlightsDetails() {
 	const { id } = useParams();
-	const { fetchFlightById } = useContext(AuthContext);
+	const { fetchFlightById, bookFlight } = useContext(AuthContext);
 	const [flightData, setFlightData] = useState({});
+	const [clicked, setClicked] = useState(false);
 	useEffect(() => {
 		async function data() {
 			setFlightData(await fetchFlightById(id));
@@ -67,8 +68,18 @@ function FlightsDetails() {
 				<button
 					className="w-full py-3 bg-[rgb(6,214,160)] text-white rounded-lg font-semibold shadow 
                          hover:bg-[rgb(4,180,135)] transition active:scale-98"
+					onClick={() => {
+						if (!clicked) {
+							bookFlight(
+								flightData._id,
+								flightData.pricePerNight,
+								flightData.date
+							);
+							setClicked(true);
+						}
+					}}
 				>
-					Book This Flight
+					{clicked ? "Flight booked" : "Book This Flight"}
 				</button>
 			</div>
 		</div>

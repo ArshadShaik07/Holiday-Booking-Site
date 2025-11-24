@@ -4,8 +4,10 @@ import { useContext, useEffect, useState } from "react";
 
 function HotelDetails() {
 	const { id } = useParams();
-	const { fetchHotelById } = useContext(AuthContext);
+	const { fetchHotelById, bookHotel } = useContext(AuthContext);
 	const [hotelData, setHotelData] = useState({});
+	const [date, setDate] = useState("");
+	const [booked, setBooked] = useState(false);
 
 	useEffect(() => {
 		async function abc() {
@@ -54,12 +56,33 @@ function HotelDetails() {
 					</div>
 				</div>
 
+				<input
+					type="date"
+					value={date}
+					onChange={(e) => {
+						setDate(e.target.value);
+					}}
+				/>
 				{/* Book Button */}
 				<button
 					className="w-full py-3 bg-[rgb(6,214,160)] text-white font-semibold rounded-lg shadow 
                          hover:bg-[rgb(4,180,135)] transition active:scale-98"
+					onClick={() => {
+						if (date.length === 0) {
+							alert("specify date for booking!");
+						} else {
+							if (!booked) {
+								bookHotel(
+									hotelData._id,
+									hotelData.pricePerNight,
+									date
+								);
+								setBooked(true);
+							}
+						}
+					}}
 				>
-					Book This Hotel
+					{booked ? "Hotel booked" : "Book This Hotel"}
 				</button>
 			</div>
 		</div>

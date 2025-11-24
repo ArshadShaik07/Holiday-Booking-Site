@@ -47,7 +47,7 @@ function Hotels() {
 			</div>
 			<div>
 				<p
-					className="text-lg font-light underline cursor-default"
+					className="text-lg font-medium underline cursor-default"
 					onClick={() => fetchHotels("")}
 				>
 					All hotels
