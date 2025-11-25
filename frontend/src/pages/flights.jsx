@@ -14,7 +14,7 @@ function Flights() {
 
 	return (
 		<div className="flex flex-col min-h-[calc(100vh-64px)] items-center gap-8 p-6 bg-gray-50 relative">
-			<p className="text-5xl font-semibold text-gray-800 tracking-tight">
+			<p className="text-4xl sm:text-5xl font-semibold text-gray-800 tracking-tight text-center">
 				Flights
 			</p>
 
@@ -24,7 +24,7 @@ function Flights() {
 					value={from}
 					onChange={(e) => setFrom(e.target.value)}
 					className="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm
-             focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition"
+      focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition"
 					placeholder="From city"
 				/>
 
@@ -43,15 +43,15 @@ function Flights() {
 						}
 					}}
 					className="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm
-             focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition"
+      focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition"
 					placeholder="To city"
 				/>
 
 				<input
 					type="date"
 					onChange={(e) => setDate(e.target.value)}
-					className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm 
-             focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition"
+					className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm
+      focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] focus:border-[rgb(6,214,160)] transition sm:w-auto w-full"
 				/>
 
 				<button
@@ -64,8 +64,8 @@ function Flights() {
 						setFrom("");
 						setTo("");
 					}}
-					className="px-6 py-2 rounded-lg bg-[rgb(6,214,160)] text-white font-semibold shadow 
-             hover:bg-[rgb(4,180,135)] active:scale-95 transition"
+					className="px-6 py-2 rounded-lg bg-[rgb(6,214,160)] text-white font-semibold shadow
+      hover:bg-[rgb(4,180,135)] active:scale-95 transition w-full sm:w-auto"
 				>
 					Search
 				</button>
@@ -73,7 +73,7 @@ function Flights() {
 
 			{/* All Flights Link */}
 			<p
-				className="text-lg font-medium text-gray-700 underline cursor-pointer hover:text-gray-900 transition"
+				className="text-base sm:text-lg font-medium text-gray-700 underline cursor-pointer hover:text-gray-900 transition select-none"
 				onClick={() => fetchFlights()}
 			>
 				All flights
