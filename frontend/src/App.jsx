@@ -8,9 +8,34 @@ import Register from "./pages/register.jsx";
 import HotelDetails from "./components/hotelDetails.jsx";
 import FlightsDetails from "./components/flightDetails.jsx";
 import "./App.css";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./context/AuthContext.jsx";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
+	const { renewToken, setLoggedIn, setAccessToken, loading, setLoading } =
+		useContext(AuthContext);
+
+	useEffect(() => {
+		async function abc() {
+			setLoading(true);
+			setAccessToken("");
+			try {
+				const newToken = await renewToken();
+				setAccessToken(newToken);
+				setLoggedIn(true);
+			} catch (e) {
+				console.log(e);
+			}
+			setLoading(false);
+		}
+		abc();
+	}, []);
+
+	if (loading) {
+		return <div>loading...</div>;
+	}
+
 	return (
 		<div className="relative">
 			<Navbar />

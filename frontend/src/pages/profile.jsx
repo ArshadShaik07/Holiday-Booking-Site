@@ -18,17 +18,21 @@ function Profile() {
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
-	async function abd() {
+	async function getProfile() {
 		setMyProfile(await getMyProfile());
 		setMyBookings(await getMybookings());
+		setPassword("");
+		setEmail("");
+		setUsername("");
 	}
 	useEffect(() => {
 		if (!loggedIn) {
 			navigate("/");
 		} else {
-			abd();
+			getProfile();
+			setUpdating(false);
 		}
-	}, [navigate, updating]);
+	}, [navigate]);
 
 	if (updating) {
 		return (
@@ -45,7 +49,7 @@ function Profile() {
 						</label>
 						<input
 							type="email"
-							val={email.length === 0 ? myProfile.email : email}
+							val={email}
 							onChange={(e) => setEmail(e.target.value)}
 							placeholder="Enter new email"
 							className="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm 
@@ -61,11 +65,7 @@ function Profile() {
 						</label>
 						<input
 							type="text"
-							val={
-								username.length === 0
-									? myProfile.username
-									: username
-							}
+							val={username}
 							placeholder="Enter new username"
 							onChange={(e) => setUsername(e.target.value)}
 							className="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm 
@@ -93,11 +93,9 @@ function Profile() {
 						<button
 							className="flex-1 py-2 bg-[rgb(6,214,160)] text-white font-semibold rounded-lg shadow 
                        hover:bg-[rgb(4,180,135)] active:scale-95 transition"
-							onClick={() => {
-								updateProfile(email, username, password);
-								setEmail("");
-								setUsername("");
-								setPassword("");
+							onClick={async () => {
+								await updateProfile(email, username, password);
+								getProfile();
 							}}
 						>
 							Save Changes
@@ -199,7 +197,7 @@ function Profile() {
 											onClick={() => {
 												console.log(b.itemId._id);
 												deleteBooking(b.itemId._id);
-												abd();
+												getProfile();
 											}}
 										>
 											Delete

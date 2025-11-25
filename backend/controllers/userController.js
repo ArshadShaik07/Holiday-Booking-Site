@@ -63,51 +63,67 @@ const loginUser = async (req, res) => {
 	const refreshToken = jwt.sign(
 		{ id: user._id.toString(), username: user.username },
 		process.env.REFRESH_TOKEN_SECRET,
-		{ expiresIn: "7d" }
+		{ expiresIn: "15d" }
 	);
 
 	refreshTokens.push(refreshToken);
 
+	res.cookie("refreshToken", refreshToken, {
+		httpOnly: true,
+		sameSite: "lax",
+		path: "/",
+		maxAge: 15 * 24 * 60 * 60 * 1000,
+	});
+
 	res.status(200).json({
 		message: "logged in succesfully",
 		accessToken,
-		refreshToken,
 	});
 };
 
 const logoutUser = async (req, res) => {
-	const authHeader = req.headers["authorization"];
-	const refreshToken = authHeader.split()[1];
+	const refreshToken = req.cookies.refreshToken;
+	console.log(refreshToken);
+	res.clearCookie("refreshToken", {
+		httpOnly: true,
+		sameSite: "lax",
+		path: "/",
+	});
 	refreshTokens = refreshTokens.filter((t) => t !== refreshToken);
 	res.status(200).json({ message: "logged out succesfully" });
 };
 
-const renewToken = async (req, res) => {
-	const authHeader = req.headers["authorization"];
-	if (!authHeader) throw Error("unauthorised!");
-	const refreshToken = authHeader.split(" ")[1];
+const renewToken = async (req, res, next) => {
+	const refreshToken = req.cookies.refreshToken;
+
+	if (!refreshToken) {
+		const error = new Error("No refresh token!");
+		error.status = 401;
+		return next(error);
+	}
 	let newAccessToken = null;
-	jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-		if (err) {
-			res.status(403);
-			throw Error("access unauthorised!");
-		}
+	try {
+		const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 		newAccessToken = jwt.sign(
 			{ id: user.id, username: user.username },
 			process.env.ACCESS_TOKEN_SECRET,
 			{ expiresIn: "10m" }
 		);
-	});
-	res.json({ accessToken: newAccessToken });
+		return res.json({ accessToken: newAccessToken });
+	} catch (e) {
+		const error = new Error("Invalid or expired refresh token!");
+		error.status = 401;
+		return next(error);
+	}
 };
 
-const getMyProfile = async (req, res) => {
+const getMyProfile = async (req, res, next) => {
 	const id = req.user.id;
 	const user = await User.findById(id).select("-password");
 	res.status(200).json(user);
 };
 
-const updateMyProfile = async (req, res) => {
+const updateMyProfile = async (req, res, next) => {
 	const id = req.user.id;
 	const updates = { ...req.body };
 
@@ -119,9 +135,9 @@ const updateMyProfile = async (req, res) => {
 		const email = updates.email.toLowerCase().trim();
 		const exists = await User.findOne({ email });
 		if (exists) {
-			res.status(400);
-			throw Error("email already exists!");
-			return;
+			const err = new Error("email already exists!");
+			err.status = 400;
+			return next(err);
 		} else {
 			updates.email = email;
 		}
@@ -129,10 +145,10 @@ const updateMyProfile = async (req, res) => {
 	if (updates.username && updates.username.length !== 0) {
 		const username = updates.username.trim();
 		const exists = await User.findOne({ username });
-		if (exists) {
-			res.status(400);
-			throw Error("username already exists!");
-			return;
+		if (exists && String(exists._id) !== String(id)) {
+			const error = new Error("username already exists!");
+			error.status = 400;
+			return next(error);
 		} else {
 			updates.username = username;
 		}

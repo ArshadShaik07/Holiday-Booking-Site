@@ -10,11 +10,13 @@ function AuthProvider({ children }) {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [accessToken, setAccessToken] = useState("");
-	const [refreshToken, setRefreshToken] = useState("");
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [hotels, setHotels] = useState([]);
 	const [flights, setFlights] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const [updating, setUpdating] = useState(false);
+	axios.defaults.withCredentials = true;
+
 	async function handleRegister() {
 		try {
 			let res = await axios.post("http://localhost:3000/api/register", {
@@ -44,7 +46,6 @@ function AuthProvider({ children }) {
 			setLoggedIn(true);
 			console.log(res.data);
 			setAccessToken(res.data.accessToken);
-			setRefreshToken(res.data.refreshToken);
 		} catch (e) {
 			console.error(e.response.data);
 			alert(e.response.data.error);
@@ -61,14 +62,11 @@ function AuthProvider({ children }) {
 				"http://localhost:3000/api/logout",
 				{},
 				{
-					headers: {
-						Authorization: `Bearer ${refreshToken}`,
-						"Content-Type": "application/json",
-					},
+					withCredentials: true,
 				}
 			);
 
-			console.log(res.data);
+			alert(res.data.message);
 			setLoggedIn(false);
 		} catch (e) {
 			console.error(e);
@@ -92,11 +90,15 @@ function AuthProvider({ children }) {
 					},
 				}
 			);
-			alert("updated successfully");
 			console.log(res.data);
 			setUpdating(false);
+			alert("updated successfully");
 		} catch (e) {
 			console.log(e.response);
+			if (e.response.status === 401) {
+				renewToken();
+			}
+			alert(e.response.data.error);
 		}
 	}
 
@@ -153,8 +155,8 @@ function AuthProvider({ children }) {
 			);
 			console.log(res.data);
 		} catch (e) {
-			console.log(e.response.data.error);
-			if (e.response.data.error === "forbidden page!") {
+			console.log(e.response);
+			if (e.response.status === 401) {
 				alert("login first to book hotels!");
 			}
 		}
@@ -179,48 +181,127 @@ function AuthProvider({ children }) {
 			);
 			console.log(res.data);
 		} catch (e) {
-			console.log(e.response.data.error);
-			if (e.response.data.error === "forbidden page!") {
+			console.log(e.response.status);
+			if (e.response.status === 401) {
 				alert("login first to book flights!");
 			}
 		}
 	}
 
+	async function renewToken() {
+		const res = await axios.get("http://localhost:3000/api/token");
+		return res.data.accessToken;
+	}
+
 	async function getMyProfile() {
-		const res = await axios.get("http://localhost:3000/api/me", {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		return res.data;
-	}
-
-	async function getMybookings() {
-		const res = await axios.get("http://localhost:3000/api/mybookings", {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		console.log(res.data);
-		return res.data;
-	}
-
-	async function deleteBooking(id) {
-		const res = await axios.delete(
-			`http://localhost:3000/api/bookings/${id}`,
-			{
+		try {
+			const res = await axios.get("http://localhost:3000/api/me", {
 				headers: {
 					Authorization: `Bearer ${accessToken}`,
 				},
+			});
+
+			return res.data;
+		} catch (e) {
+			console.log(e.response);
+			if (e.response.status === 401) {
+				const newAccessToken = await renewToken();
+				console.log(newAccessToken + " from profile");
+				setAccessToken(newAccessToken);
+				try {
+					const res = await axios.get(
+						"http://localhost:3000/api/me",
+						{
+							headers: {
+								Authorization: `Bearer ${newAccessToken}`,
+							},
+						}
+					);
+					return res.data;
+				} catch (e) {
+					alert("session expired!");
+					handleLogout();
+				}
 			}
-		);
-		alert(res.data.message);
+		}
+	}
+
+	async function getMybookings() {
+		try {
+			const res = await axios.get(
+				"http://localhost:3000/api/mybookings",
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}
+			);
+			console.log(res.data);
+			return res.data;
+		} catch (e) {
+			console.log(e.response);
+			if (e.response.status === 401) {
+				try {
+					const newAccessToken = await renewToken();
+					setAccessToken(newAccessToken);
+					const res = await axios.get(
+						"http://localhost:3000/api/mybookings",
+						{
+							headers: {
+								Authorization: `Bearer ${newAccessToken}`,
+							},
+						}
+					);
+					return res.data;
+				} catch (e) {
+					alert("session expired!");
+					handleLogout();
+					navigate("/");
+				}
+			}
+		}
+	}
+
+	async function deleteBooking(id) {
+		try {
+			const res = await axios.delete(
+				`http://localhost:3000/api/bookings/${id}`,
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				}
+			);
+			alert(res.data.message);
+		} catch (e) {
+			console.log(e.response);
+			if (e.response.status === 401) {
+				try {
+					const newAccessToken = await renewToken();
+					setAccessToken(newAccessToken);
+					const res = await axios.delete(
+						`http://localhost:3000/api/bookings/${id}`,
+						{
+							headers: {
+								Authorization: `Bearer ${newAccessToken}`,
+							},
+						}
+					);
+					alert(res.data.message);
+				} catch (e) {
+					alert("session expired!");
+					handleLogout();
+					navigate("/");
+				}
+			}
+		}
 	}
 
 	return (
 		<AuthContext.Provider
 			value={{
 				accessToken,
+				setAccessToken,
 				email,
 				setEmail,
 				password,
@@ -247,6 +328,9 @@ function AuthProvider({ children }) {
 				updateProfile,
 				updating,
 				setUpdating,
+				loading,
+				setLoading,
+				renewToken,
 			}}
 		>
 			{children}

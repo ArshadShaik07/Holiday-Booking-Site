@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 function HotelDetails() {
 	const { id } = useParams();
-	const { fetchHotelById, bookHotel } = useContext(AuthContext);
+	const { fetchHotelById, bookHotel, loggedIn } = useContext(AuthContext);
 	const [hotelData, setHotelData] = useState({});
 	const [date, setDate] = useState("");
 	const [booked, setBooked] = useState(false);
@@ -71,13 +71,17 @@ function HotelDetails() {
 						if (date.length === 0) {
 							alert("specify date for booking!");
 						} else {
-							if (!booked) {
-								bookHotel(
-									hotelData._id,
-									hotelData.pricePerNight,
-									date
-								);
-								setBooked(true);
+							if (loggedIn) {
+								if (!booked) {
+									bookHotel(
+										hotelData._id,
+										hotelData.pricePerNight,
+										date
+									);
+									setBooked(true);
+								}
+							} else {
+								alert("log in to book hotel!");
 							}
 						}
 					}}

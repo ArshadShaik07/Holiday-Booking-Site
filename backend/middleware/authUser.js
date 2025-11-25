@@ -5,14 +5,22 @@ function authUser(req, res, next) {
 	if (!authHeader) throw Error("Unauthorised");
 	const accessToken = authHeader.split(" ")[1];
 
-	jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-		if (err) {
-			res.status(403);
-			throw Error("forbidden page!");
-		}
-		req.user = user;
-	});
-	next();
+	try {
+		const decoded = jwt.verify(
+			accessToken,
+			process.env.ACCESS_TOKEN_SECRET
+		);
+		req.user = decoded;
+		return next();
+	} catch (err) {
+		const msg =
+			err.name === "TokenExpiredError"
+				? "Token expired"
+				: "Invalid token";
+		const error = new Error(msg);
+		error.status = 401;
+		next(error);
+	}
 }
 
 export { authUser };

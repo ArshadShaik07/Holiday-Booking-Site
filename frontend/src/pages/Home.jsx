@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 
 export default function Home() {
 	const navigate = useNavigate();
-	const { loggedIn, setLoggedIn } = useContext(AuthContext);
+	const { loggedIn, setLoggedIn, handleLogout } = useContext(AuthContext);
 
 	return (
 		<div className="min-h-[calc(100vh-64px)] bg-gray-200 flex flex-col">
@@ -43,10 +43,13 @@ export default function Home() {
 						<button
 							className="p-0 rounded font-medium cursor-pointer m-0 "
 							onClick={() => {
-								loggedIn
-									? navigate("/")
-									: navigate("/register");
-								setLoggedIn(false);
+								if (loggedIn) {
+									navigate("/");
+									setLoggedIn(false);
+									handleLogout();
+								} else {
+									navigate("/register");
+								}
 							}}
 						>
 							{loggedIn ? "Log-out" : "Sign in"}
