@@ -1,0 +1,15 @@
+.dots{
+    display: inline-block;
+    width: 7ch;
+    overflow: hidden;
+    animation: dots 1s infinite;
+}
+
+@keyframes dots{
+    from{
+        width:7ch
+    }
+    to{
+        width: 10ch;
+    }
+}

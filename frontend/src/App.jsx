@@ -27,13 +27,17 @@ function App() {
 			} catch (e) {
 				console.log(e);
 			}
-			setLoading(false);
+			setTimeout(() => setLoading(false), 1500);
 		}
 		abc();
 	}, []);
 
 	if (loading) {
-		return <div>loading...</div>;
+		return (
+			<div className="min-h-screen min-w-full overflow-hidden flex justify-center items-center bg-[rgb(255,209,102)]">
+				<p className="dots font-mono text-xl ">Loading...</p>
+			</div>
+		);
 	}
 
 	return (
