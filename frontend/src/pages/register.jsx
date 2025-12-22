@@ -32,30 +32,45 @@ function Register() {
 				/>
 
 				{/* Email Input */}
-				<input
-					type="email"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					placeholder="Enter email"
-					className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
-				/>
+				<div className="w-full flex flex-col">
+					<label className="text-sm font-bold text-gray-700 ml-1 w-full p-0 m-0">
+						Enter Email Id
+					</label>
+					<input
+						type="email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						placeholder="Enter email"
+						className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
+					/>
+				</div>
 
 				{/* Username Input */}
-				<input
-					value={username}
-					onChange={(e) => setUsername(e.target.value)}
-					placeholder="Enter username"
-					className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
-				/>
+				<div className="w-full flex flex-col">
+					<label className="text-sm font-bold text-gray-700 ml-1 w-full p-0 m-0">
+						Create a username
+					</label>
+					<input
+						value={username}
+						onChange={(e) => setUsername(e.target.value)}
+						placeholder="Enter username"
+						className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
+					/>
+				</div>
 
 				{/* Password Input */}
-				<input
-					type="password"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					placeholder="Enter password"
-					className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
-				/>
+				<div className="w-full flex flex-col">
+					<label className="text-sm font-bold text-gray-700 ml-1 w-full p-0 m-0">
+						Enter Password
+					</label>
+					<input
+						type="password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						placeholder="Enter password"
+						className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
+					/>
+				</div>
 
 				{/* Sign In Button */}
 				<button
@@ -73,7 +88,7 @@ function Register() {
 
 				{/* Login Page Link */}
 				<NavLink to="/login">
-					<p className="text-sm text-gray-600 hover:text-gray-800 transition mt-2 select-none cursor-pointer">
+					<p className="text-sm text-gray-600 hover:text-gray-800 hover:-translate-y-0.5 transition mt-2 select-none cursor-pointer">
 						Already have an account?
 					</p>
 				</NavLink>
