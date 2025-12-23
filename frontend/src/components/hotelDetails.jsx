@@ -14,100 +14,114 @@ function HotelDetails() {
 			setHotelData(await fetchHotelById(id));
 		}
 		abc();
-	}, []);
-	console.log(hotelData);
+	}, [id]);
 
 	return (
-		<div className="min-h-screen w-full flex justify-center items-center p-4 sm:p-6 bg-gray-50">
-			<div
-				className="w-full max-w-2xl bg-white shadow-xl rounded-xl overflow-hidden"
-				style={
-					{
-						// keep your background image but let Tailwind handle sizing via inner element
-					}
-				}
-			>
-				{/* Background image + overlay */}
-				<div
-					className="relative w-full bg-cover bg-center"
-					style={{
-						backgroundImage:
-							"url('https://plus.unsplash.com/premium_vector-1724302612226-05cd23f5c8f7?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzh8fGhvdGVsc3xlbnwwfHwwfHx8MA%3D%3D')",
-					}}
-				>
-					{/* overlay for readability */}
-					<div className="absolute inset-0 bg-black/40"></div>
+		<div className="min-h-screen w-full bg-slate-50 flex justify-center items-center p-4 pt-32">
+			<div className="w-full max-w-4xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden border border-slate-100">
+				<div className="flex flex-col lg:flex-row">
+					<div className="relative lg:w-1/2 h-72 lg:h-auto overflow-hidden">
+						<img
+							src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1470&auto=format&fit=crop"
+							className="w-full h-full object-cover"
+							alt="Hotel view"
+						/>
+						<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-white/10"></div>
+						<div className="absolute bottom-6 left-6 lg:hidden">
+							<h1 className="text-3xl font-black text-white tracking-tight">
+								{hotelData.name}
+							</h1>
+							<p className="text-white/80 font-bold uppercase text-xs tracking-widest mt-1 italic">
+								📍 {hotelData.city}
+							</p>
+						</div>
+					</div>
 
-					{/* content placed above overlay */}
-					<div className="relative p-6 sm:p-8 flex flex-col gap-4">
-						{/* Hotel Name */}
-						<p className="text-2xl sm:text-3xl font-bold text-white">
-							{hotelData.name}
-						</p>
+					<div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
+						<div className="hidden lg:block mb-8">
+							<span className="text-blue-600 font-black uppercase text-xs tracking-[0.2em]">
+								Premium Stay
+							</span>
+							<h1 className="text-4xl font-black text-slate-900 tracking-tight mt-2 capitalize">
+								{hotelData.name}
+							</h1>
+							<p className="text-slate-400 font-bold mt-2 flex items-center gap-1">
+								<span>📍</span> {hotelData.city}, India
+							</p>
+						</div>
 
-						{/* City */}
-						<p className="text-sm sm:text-base text-white/90 capitalize">
-							📍 {hotelData.city}
-						</p>
-
-						{/* Divider */}
-						<div className="border-b border-white/30 mt-1 mb-2"></div>
-
-						{/* Price + Rooms */}
-						<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-							<div>
-								<p className="text-sm text-white/80">
-									Price per night
+						<div className="grid grid-cols-2 gap-8 mb-10">
+							<div className="space-y-1">
+								<p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+									Rate
 								</p>
-								<p className="text-2xl sm:text-3xl font-semibold text-white">
+								<p className="text-3xl font-black text-slate-900">
 									₹{hotelData.pricePerNight}
+									<span className="text-sm text-slate-400">
+										/nt
+									</span>
 								</p>
 							</div>
-
-							<div className="text-right">
-								<p className="text-sm text-white/80">
-									Rooms available
+							<div className="space-y-1">
+								<p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+									Availability
 								</p>
-								<p className="text-xl sm:text-2xl font-semibold text-white">
+								<p className="text-3xl font-black text-slate-900">
 									{hotelData.roomsAvailable}
+									<span className="text-sm text-slate-400 font-bold ml-1">
+										left
+									</span>
 								</p>
 							</div>
 						</div>
 
-						{/* Date input */}
-						<input
-							type="date"
-							value={date}
-							onChange={(e) => {
-								setDate(e.target.value);
-							}}
-							className="w-full sm:w-1/2 px-3 py-2 rounded-md border border-white/40 bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[rgb(6,214,160)] transition"
-						/>
+						<div className="space-y-6">
+							<div className="space-y-2">
+								<label className="text-sm font-black text-slate-700 ml-1">
+									Check-in Date
+								</label>
+								<input
+									type="date"
+									value={date}
+									onChange={(e) => setDate(e.target.value)}
+									className="w-full bg-slate-50 border-2 border-transparent px-6 py-4 rounded-2xl focus:outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700 cursor-pointer"
+								/>
+							</div>
 
-						{/* Book Button */}
-						<button
-							className="w-full sm:w-auto py-3 px-6 bg-[rgb(6,214,160)] text-white font-semibold rounded-lg shadow hover:bg-[rgb(4,180,135)] transition active:scale-95"
-							onClick={() => {
-								if (date.length === 0) {
-									alert("specify date for booking!");
-								} else {
-									if (loggedIn) {
-										if (!booked) {
-											bookHotel(
-												hotelData._id,
-												hotelData.pricePerNight,
-												date
-											);
-											setBooked(true);
-										}
+							<button
+								onClick={() => {
+									if (date.length === 0) {
+										alert("specify date for booking!");
 									} else {
-										alert("log in to book hotel!");
+										if (loggedIn) {
+											if (!booked) {
+												bookHotel(
+													hotelData._id,
+													hotelData.pricePerNight,
+													date
+												);
+												setBooked(true);
+											}
+										} else {
+											alert("log in to book hotel!");
+										}
 									}
-								}
-							}}
-						>
-							{booked ? "Hotel booked" : "Book This Hotel"}
-						</button>
+								}}
+								className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl transition-all duration-300 active:scale-95 ${
+									booked
+										? "bg-slate-100 text-slate-400 cursor-default shadow-none"
+										: "bg-slate-900 text-white hover:bg-blue-600 shadow-slate-200"
+								}`}
+							>
+								{booked ? "Booking Confirmed ✓" : "Reserve Now"}
+							</button>
+
+							{!booked && (
+								<p className="text-center text-xs font-bold text-slate-400 uppercase tracking-tighter">
+									No immediate payment required
+								</p>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

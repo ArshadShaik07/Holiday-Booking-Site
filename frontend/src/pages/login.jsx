@@ -12,7 +12,7 @@ function Login() {
 		setPassword("");
 	}, []);
 	return (
-		<div className="flex justify-center items-center min-h-screen p-4 min-w-screen bg-gray-300 relative">
+		<div className="flex scale-50 md:scale-100 justify-center items-center min-h-screen p-4 min-w-screen bg-gray-300 relative">
 			<div className="flex flex-col items-center gap-5 bg-gray-200 p-6 rounded-xl shadow-lg w-full max-w-xs sm:max-w-sm">
 				{/* Circular Logo */}
 				<CircularText
